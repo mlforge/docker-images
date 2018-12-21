@@ -1,0 +1,23 @@
+language: bash
+services: docker
+
+env:
+  - STACK=scikit-learn-pandas PYTHON_VERSION=36 SCIKIT_LEARN_VERSION=0.20.2 PANDAS_VERSION=0.23.4 VARIANT=alpine3.8
+
+before_script:
+  - wget -qO- 'https://github.com/tianon/pgp-happy-eyeballs/raw/master/hack-my-builds.sh' | bash
+  - cd scikit-learn
+  - image="${STACK}:py${PYTHON_VERSION}-sk${SCIKIT_LEARN_VERSION}-pd${PANDAS_VERSION}-${VARIANT}"
+
+script:
+  - |
+    (
+      set -Eeuo pipefail
+      set -x
+      docker build -t "$image" \
+       --build-arg SCIKIT_LEARN_VERSION=$SCIKIT_LEARN_VERSION \
+       --build-arg PANDAS_VERSION=$PANDAS_VERSION \
+       .
+    )
+after_script:
+  - docker images
